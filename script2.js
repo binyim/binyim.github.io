@@ -17,45 +17,65 @@ function populateInfo()
 	if (location.search)
 	{ 
 		var queryData = location.search;
+		var hiddenInputs = document.querySelectorAll("input[type=hidden]");
 		queryData = queryData.substring(1, queryData.length);
 		queryArray = queryData.split("&");
+		for (var i =0; i < queryArray.length; i++)
+		{
+			hiddenInputs[i].value = queryArray[i].substring(queryArray[i].lastIndexOf("=") + 1);
+		}
 	}
 }
-   
-/* function createEventListeners()
-{ 
-	var fname = document.getElementById("fnameinput"); 
-	var lname = document.getElementById("lnameinput"); 
-	var zip = document.getElementById("zipinput"); 
-	if	(fname.addEventListener)
-	{ 
-		fname.addEventListener("change", createID, false); 
-		lname.addEventListener("change", createID, false); 
-		zip.addEventListener("change", createID, false); 
-	}
-	else if	(fname.attachEvent)
+
+function createCookies()
+{
+	var formFields = document.querySelectorAll("input[type=hidden], input[type=radio], textarea");
+	for (var i = 0; i < formFields.length; i++)
 	{
-		fname.attachEvent("onchange", createID);
-		lname.attachEvent("onchange", createID);
-		zip.attachEvent("onchange", createID);
+		var currentValue = decodeURIComponent(formFields[i].value);
+		currentValue = currentValue.replace(/\+/g, " ");
+		document.cookie = formFields[i].name +"="+ currentValue;
 	}
 }
 
-if (window.addEventListener)
+functionhandleSubmit(evt)
 {
-	window.addEventListener("load", createEventListeners,false);
+	if (evt.preventDefault)
+	{
+		evt.preventDefault(); // prevent form from submitting
+	}
+	else
+	{
+		evt.returnValue =false; // prevent form from submitting in IE8
+	}
+	createCookies();
+	document.getElementsByTagName("form")[0].submit();
+}	
+
+function createEventListeners()
+{ 
+	var form =document.getElementsByTagName("form")[0]; 
+	if	(form.addEventListener)
+	{ 
+		form.addEventListener("submit", handleSubmit, false); 
+	}
+	else if	(form.attachEvent)
+	{
+		form.attachEvent("onsubmit", handleSubmit);
+	}
 }
-else if	(window.attachEvent)
+
+function setUpPage()
 {
-	window.attachEvent("onload", createEventListeners);
+	createEventListeners();
+	populateInfo();
 }
-*/
 
 if (window.addEventListener)
 {
-	window.addEventListener("load", populateInfo,false);
+	window.addEventListener("load", setUpPage, false);
 }
 else if	(window.attachEvent)
 {
-	window.attachEvent("onload", populateInfo);
+	window.attachEvent("onload", setUpPage);
 }
